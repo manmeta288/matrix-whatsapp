@@ -30,6 +30,8 @@ appservice:
     id: whatsapp
     bot_username: whatsappbot
 
+hacky_network_config_migrator: true
+
 network:
     displayname_template: "{displayname} (WA)"
     username_template: "whatsapp_{userid}"
