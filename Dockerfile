@@ -15,6 +15,5 @@ RUN apk add --no-cache ffmpeg su-exec ca-certificates olm bash jq curl yq-go lot
 
 COPY --from=builder /build/mautrix-whatsapp /usr/bin/mautrix-whatsapp
 COPY --from=builder /build/docker-run.sh /docker-run.sh
-VOLUME /data
 
 CMD ["/docker-run.sh"]
