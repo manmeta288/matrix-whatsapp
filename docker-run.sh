@@ -14,6 +14,53 @@ function fixperms {
 	fi
 }
 
+# Generate config from environment variables if they exist and no config exists
+if [[ ! -f /data/config.yaml ]] && [[ -n "$HOMESERVER_DOMAIN" ]]; then
+	echo "Generating config.yaml from environment variables..."
+	cat > /data/config.yaml << EOF
+homeserver:
+    address: ${HOMESERVER_ADDRESS:-http://localhost:8008}
+    domain: ${HOMESERVER_DOMAIN}
+
+appservice:
+    address: ${APPSERVICE_ADDRESS:-http://localhost:29318}
+    hostname: ${APPSERVICE_HOSTNAME:-0.0.0.0}
+    port: ${APPSERVICE_PORT:-29318}
+    
+    database:
+        type: postgres
+        uri: ${DATABASE_URL}
+    
+    id: whatsapp
+    bot_username: whatsappbot
+    ephemeral_events: true
+
+bridge:
+    username_template: "whatsapp_{userid}"
+    displayname_template: "{displayname} (WA)"
+    
+    permissions:
+        "*": relay
+        "${HOMESERVER_DOMAIN}": user
+
+logging:
+    version: 1
+    formatters:
+        colored:
+            (): mautrix.util.color_log.ColorFormatter
+    handlers:
+        console:
+            class: logging.StreamHandler
+            formatter: colored
+    loggers:
+        mau:
+            level: INFO
+    root:
+        level: INFO
+        handlers: [console]
+EOF
+fi
+
 if [[ ! -f /data/config.yaml ]]; then
 	/usr/bin/mautrix-whatsapp -c /data/config.yaml -e
 	echo "Didn't find a config file."
