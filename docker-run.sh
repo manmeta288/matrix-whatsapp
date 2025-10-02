@@ -7,12 +7,10 @@ fi
 # Define functions.
 function fixperms {
 	chown -R $UID:$GID /data
-
-	# /opt/mautrix-whatsapp is read-only, so disable file logging if it's pointing there.
-	if [[ "$(yq e '.logging.writers[1].filename' /data/config.yaml)" == "./logs/mautrix-whatsapp.log" ]]; then
-		yq -I4 e -i 'del(.logging.writers[1])' /data/config.yaml
-	fi
 }
+
+# Create /data directory if it doesn't exist
+mkdir -p /data
 
 # Generate config from environment variables if they exist and no config exists
 if [[ ! -f /data/config.yaml ]] && [[ -n "$HOMESERVER_DOMAIN" ]]; then
@@ -26,16 +24,12 @@ appservice:
     address: ${APPSERVICE_ADDRESS:-http://localhost:29318}
     hostname: ${APPSERVICE_HOSTNAME:-0.0.0.0}
     port: ${APPSERVICE_PORT:-29318}
-    
     database:
         type: postgres
         uri: ${DATABASE_URL}
-    
     id: whatsapp
     bot_username: whatsappbot
-    ephemeral_events: true
 
-# NEW MEGABRIDGE FORMAT
 network:
     displayname_template: "{displayname} (WA)"
     username_template: "whatsapp_{userid}"
