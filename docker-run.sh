@@ -4,15 +4,12 @@ if [[ -z "$GID" ]]; then
 	GID="$UID"
 fi
 
-# Define functions.
 function fixperms {
 	chown -R $UID:$GID /data
 }
 
-# Create /data directory if it doesn't exist
 mkdir -p /data
 
-# Generate config from environment variables if they exist and no config exists
 if [[ ! -f /data/config.yaml ]] && [[ -n "$HOMESERVER_DOMAIN" ]]; then
 	echo "Generating config.yaml from environment variables..."
 	cat > /data/config.yaml << EOF
@@ -24,11 +21,12 @@ appservice:
     address: ${APPSERVICE_ADDRESS:-http://localhost:29318}
     hostname: ${APPSERVICE_HOSTNAME:-0.0.0.0}
     port: ${APPSERVICE_PORT:-29318}
-    database:
-        type: postgres
-        uri: ${DATABASE_URL}
     id: whatsapp
     bot_username: whatsappbot
+
+database:
+    type: postgres
+    uri: ${DATABASE_URL}
 
 hacky_network_config_migrator: true
 
